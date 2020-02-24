@@ -28,7 +28,7 @@ public class UserController {
         Subject subject = SecurityUtils.getSubject();
        //将前端传过来的密码变为字符数组
         UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
-
+        System.out.println("kkk");
         try {
             subject.login(token);//这儿会抛出异常
         } catch (AuthenticationException e) {
