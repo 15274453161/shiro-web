@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+     <import resource="classpath:spring-config.xml"/>
+    <!--配置扫描的路径-->
+    <context:component-scan base-package="com.qgh.shiro"/>
+
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"></property>
+        <property name="loginUrl" value="login.html"></property><!--登录页-->
+        <property name="unauthorizedUrl" value="403.html"></property><!--未认证的跳转页面-->
+        <property name="filterChainDefinitions"><!--过滤器链 从上往下匹配-->
+            <value>
+                /login.html=anon <!--不需要认证-->
+                /subLogin=anon <!--提交登录的请求不需要认证-->
+                /testRole=roles["admin"]
+                /testRole1=roles["admin","admin1"]
+                /testPerms1=perms["user:delete"]
+                /testperms2=perms["user:delete","user:update"]<!--同时具备-->
+               <!--/*=authc --><!--需要经过认证才能访问响应的路径 一般放在最下面-->
+            </value>
+        </property>
+    </bean>
+
+    <!-- 开始创建shiro需要的对象 步骤-->
+    <!--1、创建SecurityManager对象-->
+    <bean class="org.apache.shiro.web.mgt.DefaultWebSecurityManager" id="securityManager">
+       <!-- 将自定义的realm加入到SecurityManager对象中去-->
+        <property name="realm" ref="realm"></property>
+    </bean>
+
+    <!--2、创建自定义realm-->
+    <bean class="com.qgh.shiro.realm.CustomRealm" id="realm">
+        <!--5、将加密对象设置到自定义的realm中-->
+        <property name="credentialsMatcher" ref="credentialsMatcher"></property>
+    </bean>
+    <!--3、加密对象-->
+    <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher" id="credentialsMatcher">
+        <property name="hashAlgorithmName" value="md5"></property><!--加密算法-->
+        <property name="hashIterations" value="1"></property><!--加密次数-->
+    </bean>
+</beans>

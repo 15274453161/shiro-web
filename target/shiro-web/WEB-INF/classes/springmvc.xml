@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/mvc
+           http://www.springframework.org/schema/mvc/spring-mvc.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:component-scan base-package="com.qgh.shiro.controller"></context:component-scan>
+    <mvc:annotation-driven/>
+    <!--排除静态文件 使用resource过滤掉不需要经过dispacherSevlet的资源 及静态资源 必须和annotation-driven
+     一起使用 否则resources元素会阻止任意的控制器被调用-->
+    <mvc:resources mapping="/*" location="/"></mvc:resources>
+
+    <!--视图解析器  返回页面时html时必须要 否则会报404-->
+
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass"
+                  value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/"/>
+        <property name="suffix" value=".html"/>
+    </bean>
+
+    <!-- shiro注解授权配置-->
+    <aop:config proxy-target-class="true"/>
+    <!-- 保证shiro内部lifecycle执行的对象-->
+    <bean class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+    <!--创建一个shiro授权生效的对象那个-->
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <!--  注入securimanager-->
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+</beans>
